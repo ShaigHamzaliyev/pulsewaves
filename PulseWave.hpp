@@ -6,7 +6,7 @@
 #include <vector>
 
 class VLR {
-    // Declare VLR class members and methods here
+    // std::string pls
 };
 
 class PulseRecord {
@@ -22,8 +22,10 @@ public:
     PulseWaves(const std::string& pls_file);
 
     // Define PulseWaves class methods here
+// PulseWaves(const std::string& pls_file);
+    std::vector<std::vector<std::pair<double, double>>> pulseWave();
 
-private:
+// private:
     // Define PulseWaves class members here
 };
 
