@@ -55,6 +55,27 @@ PulseWaves::PulseWaves(const std::string& pls_file) {
         std::cerr << "Error reading proj_GUID2." << std::endl;
     }
 
+    // Unpack proj_GUID3;
+    uint16_t proj_GUID3;
+    if (!f.read(reinterpret_cast<char*>(&proj_GUID3), sizeof(proj_GUID3))){
+        std::cerr << "Error reading proj_GUID3." << std::endl;
+    }
+
+    // Unpack proj_GUID4;
+    unsigned char proj_GUID4[8];
+    if (!f.read(reinterpret_cast<char*>(&proj_GUID4), sizeof(proj_GUID4))){
+        std::cerr << "Error reading proj_GUID4." << std::endl;
+    }
+
+    char sysIdentifier[64];
+    f.read(sysIdentifier, 64);
+    std::string systemIdentifier(sysIdentifier);
+
+    char genSoftware[64];
+    f.read(genSoftware, 64);
+    std::string generateSoftware(genSoftware);
+    
+
     // Read variable length records (VLR)
     for (int num_vlr = 0; num_vlr < num_vlr_; num_vlr++) {
         VLR vlr(f);
