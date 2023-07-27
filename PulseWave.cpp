@@ -6,6 +6,28 @@
 // Define methods of VLR class here
 // ...
 
+VLR::VLR(std::ifstream& f){
+    char user_id_data[16];
+    f.read(user_id_data, sizeof(user_id_data));
+    user_id = std::string(user_id_data).substr(0, 16);
+
+    uint32_t temp;
+    f.read(reinterpret_cast<char*>(&temp), sizeof(temp));
+    record_id = temp;
+
+    f.read(reinterpret_cast<char*>(&temp), sizeof(temp));
+    reserved = temp;
+
+    int64_t temp_record_length;
+    f.read(reinterpret_cast<char*>(&temp_record_length), sizeof(temp_record_length));
+    record_length = temp_record_length;
+
+    char description_data[64];
+    f.read(description_data, sizeof(description_data));
+    description = std::string(description_data).substr(0, 64);
+}
+
+
 // Constructor implementation for PulseWaves class
 PulseWaves::PulseWaves(const std::string& pls_file) {
     if (pls_file.substr(pls_file.length() - 3) != "pls") {
@@ -262,8 +284,8 @@ PulseWaves::PulseWaves(const std::string& pls_file) {
     }
 
     // Read variable length records (VLR)
-    for (int num_vlr = 0; num_vlr < num_vlr_; num_vlr++) {
-        VLR vlr(f);
+    for (int num_vlr = 0; num_vlr < numberVariableLengthRecord; num_vlr++) {
+        VLR VLR(f);
         // Handle different VLR types
         // ...
 
