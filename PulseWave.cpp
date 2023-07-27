@@ -165,6 +165,102 @@ PulseWaves::PulseWaves(const std::string& pls_file) {
         std::cerr << "Error reading numberAppendedVariableLengthRecord." << std::endl;
     }
 
+    // Unpack T Scale Factor;
+     double tScaleFactor;
+    if (!f.read(reinterpret_cast<char*>(&tScaleFactor), sizeof(tScaleFactor))){
+        std::cerr << "Error reading tScaleFactor." << std::endl;
+    }
+
+    // Unpack T Offset;
+     double tOffset;
+    if (!f.read(reinterpret_cast<char*>(&tOffset), sizeof(tOffset))){
+        std::cerr << "Error reading tOffset." << std::endl;
+    }
+
+    // Unpack Min T;
+    uint64_t minT;
+    if (!f.read(reinterpret_cast<char*>(minT), sizeof(minT))){
+        std::cerr << "Error reading minT." << std::endl;
+    }
+
+    // Unpack Max T;
+    uint64_t maxT;
+    if (!f.read(reinterpret_cast<char*>(maxT), sizeof(maxT))){
+        std::cerr << "Error reading maxT." << std::endl;
+    }
+
+    // Unpack X ScaleFactor;
+     double xScaleFactor;
+    if (!f.read(reinterpret_cast<char*>(&xScaleFactor), sizeof(xScaleFactor))){
+        std::cerr << "Error reading xScaleFactor." << std::endl;
+    }
+
+    // Unpack Y ScaleFactor;
+     double yScaleFactor;
+    if (!f.read(reinterpret_cast<char*>(&yScaleFactor), sizeof(yScaleFactor))){
+        std::cerr << "Error reading yScaleFactor." << std::endl;
+    }
+
+    // Unpack Z ScaleFactor;
+     double zScaleFactor;
+    if (!f.read(reinterpret_cast<char*>(&zScaleFactor), sizeof(zScaleFactor))){
+        std::cerr << "Error reading zScaleFactor." << std::endl;
+    }
+
+    // Unpack X Offset;
+     double xOffset;
+    if (!f.read(reinterpret_cast<char*>(&xOffset), sizeof(xOffset))){
+        std::cerr << "Error reading xOffset." << std::endl;
+    }
+
+    // Unpack Y Offset;
+     double yOffset;
+    if (!f.read(reinterpret_cast<char*>(&yOffset), sizeof(yOffset))){
+        std::cerr << "Error reading yOffset." << std::endl;
+    }
+
+    // Unpack Z Offset;
+     double zOffset;
+    if (!f.read(reinterpret_cast<char*>(&zOffset), sizeof(zOffset))){
+        std::cerr << "Error reading zOffset." << std::endl;
+    }
+
+    // Unpack X Minimum;
+     double xMin;
+    if (!f.read(reinterpret_cast<char*>(&xMin), sizeof(xMin))){
+        std::cerr << "Error reading xMin." << std::endl;
+    }
+
+    // Unpack Y Minimum;
+     double yMin;
+    if (!f.read(reinterpret_cast<char*>(&yMin), sizeof(yMin))){
+        std::cerr << "Error reading yMin." << std::endl;
+    }
+
+    // Unpack Z Minimum;
+     double zMin;
+    if (!f.read(reinterpret_cast<char*>(&zMin), sizeof(zMin))){
+        std::cerr << "Error reading zMin." << std::endl;
+    }
+
+    // Unpack X Maximum;
+     double xMax;
+    if (!f.read(reinterpret_cast<char*>(&xMax), sizeof(xMax))){
+        std::cerr << "Error reading xMax." << std::endl;
+    }
+
+    // Unpack Y Maximum;
+     double yMax;
+    if (!f.read(reinterpret_cast<char*>(&yMax), sizeof(yMax))){
+        std::cerr << "Error reading yMax." << std::endl;
+    }
+
+    // Unpack Z Maximum;
+     double zMax;
+    if (!f.read(reinterpret_cast<char*>(&zMax), sizeof(zMax))){
+        std::cerr << "Error reading zMax." << std::endl;
+    }
+
     // Read variable length records (VLR)
     for (int num_vlr = 0; num_vlr < num_vlr_; num_vlr++) {
         VLR vlr(f);
