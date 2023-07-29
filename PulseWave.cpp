@@ -9,22 +9,74 @@
 VLR::VLR(std::ifstream& f){
     char user_id_data[16];
     f.read(user_id_data, sizeof(user_id_data));
-    user_id = std::string(user_id_data).substr(0, 16);
+    userID = std::string(user_id_data).substr(0, 16);
 
     uint32_t temp;
     f.read(reinterpret_cast<char*>(&temp), sizeof(temp));
-    record_id = temp;
+    recordID = temp;
 
     f.read(reinterpret_cast<char*>(&temp), sizeof(temp));
     reserved = temp;
 
     int64_t temp_record_length;
     f.read(reinterpret_cast<char*>(&temp_record_length), sizeof(temp_record_length));
-    record_length = temp_record_length;
+    recordLength = temp_record_length;
 
     char description_data[64];
     f.read(description_data, sizeof(description_data));
     description = std::string(description_data).substr(0, 64);
+    
+}
+
+Scanner::Scanner(std::ifstream& f) {
+    f.read(reinterpret_cast<char*>(&size), sizeof(size));
+    f.read(reinterpret_cast<char*>(&reserved), sizeof(reserved));
+
+    char instrument_data[64];
+    f.read(instrument_data, sizeof(instrument_data));
+    instrument = std::string(instrument_data).substr(0, 64);
+
+    char serial_data[64];
+    f.read(serial_data, sizeof(serial_data));
+    serial = std::string(serial_data).substr(0, 64);
+
+    f.read(reinterpret_cast<char*>(&wavelength), sizeof(wavelength));
+    f.read(reinterpret_cast<char*>(&out_pulse_width), sizeof(out_pulse_width));
+    f.read(reinterpret_cast<char*>(&scan_pattern), sizeof(scan_pattern));
+    f.read(reinterpret_cast<char*>(&num_facets), sizeof(num_facets));
+    f.read(reinterpret_cast<char*>(&scan_frequency), sizeof(scan_frequency));
+    f.read(reinterpret_cast<char*>(&scan_angle_min), sizeof(scan_angle_min));
+    f.read(reinterpret_cast<char*>(&scan_angle_max), sizeof(scan_angle_max));
+    f.read(reinterpret_cast<char*>(&pulse_frequency), sizeof(pulse_frequency));
+    f.read(reinterpret_cast<char*>(&beam_diam), sizeof(beam_diam));
+    f.read(reinterpret_cast<char*>(&beam_diverge), sizeof(beam_diverge));
+    f.read(reinterpret_cast<char*>(&min_range), sizeof(min_range));
+    f.read(reinterpret_cast<char*>(&max_range), sizeof(max_range));
+
+    char description_data[64];
+    f.read(description_data, sizeof(description_data));
+    description = std::string(description_data).substr(0, 64);
+}
+
+PulseDecriptor::PulseDecriptor(std::ifstream& f) {
+    f.read(reinterpret_cast<char*>(&size), sizeof(size));
+    f.read(reinterpret_cast<char*>(&reserved), sizeof(reserved));
+    f.read(reinterpret_cast<char*>(&optical_center), sizeof(optical_center));
+    f.read(reinterpret_cast<char*>(&num_extra_wave_bytes), sizeof(num_extra_wave_bytes));
+    f.read(reinterpret_cast<char*>(&num_samplings), sizeof(num_samplings));
+    f.read(reinterpret_cast<char*>(&sample_units), sizeof(sample_units));
+    f.read(reinterpret_cast<char*>(&compression), sizeof(compression));
+    f.read(reinterpret_cast<char*>(&scanner_index), sizeof(scanner_index));
+
+    char description_data[64];
+    f.read(description_data, sizeof(description_data));
+    description = std::string(description_data).substr(0, 64);
+}
+
+SamplingRecord::SamplingRecord(std::ifstream& f) {
+    char descriptionData[64];
+    f.read(descriptionData, sizeof(descriptionData));
+    description = std::string(descriptionData).substr(0, 64);
 }
 
 
@@ -285,14 +337,34 @@ PulseWaves::PulseWaves(const std::string& pls_file) {
 
     // Read variable length records (VLR)
     for (int num_vlr = 0; num_vlr < numberVariableLengthRecord; num_vlr++) {
-        VLR VLR(f);
+        VLR vlr(f);
+
         // Handle different VLR types
-        // ...
+        if (vlr.recordID >= 100001 && vlr.recordID < 100255) {
+            vlr.record = Scanner(f);
+        } else if (vlr.recordID >= 200001 && vlr.recordID < 200255) {
+            // Read pulse descriptor
+            vlr.record = PulseDecriptor(f);
+            vlr.samplingRecords.clear();
+
+            // Access the underlying PulseDecriptor object
+            PulseDecriptor& pulseDescriptor = std::any_cast<PulseDecriptor&>(vlr.record);
+
+            // Read sampling records
+            for (int x = 0; x < pulseDescriptor.num_samplings; x++) {
+                SamplingRecord samplingRecord(f);
+                vlr.samplingRecords[samplingRecord.description] = samplingRecord;
+            }
+        } else {
+            // VLR is neither a scanner nor a pulse descriptor
+            std::vector<char> rawData(vlr.recordLength); // Create a buffer to read raw data
+            f.read(rawData.data(), vlr.recordLength);    // Read raw data into the buffer
+            vlr.record = rawData; // Store the raw data in the vlr.record using std::vector<char>
+        }
 
         // Add the VLR to the vlrs and avlrs containers
-        vlrs_[vlr.record_id] = vlr;
+        vlrs[vlr.recordID] = vlr; // Assuming you have a container vlrs to store VLR objects with recordID as the key
     }
-
     // Close the file
     f.close();
 }
