@@ -62,6 +62,8 @@ public:
     PulseWaves(const std::string& pls_file);
     std::map<int, VLR> vlrs;
 
+    PulseRecord getPulse(int pulseNumber);
+
     // Define PulseWaves class methods here
 // PulseWaves(const std::string& pls_file);
     // std::vector<std::vector<std::pair<double, double>>> pulseWave();

@@ -367,6 +367,14 @@ PulseWaves::PulseWaves(const std::string& pls_file) {
     }
     // Close the file
     f.close();
+    
+    PulseRecord getPulse(int pulseNumber){
+        if (pulseNumber > numberPulse || pulseNumber < 0){
+            std::cerr << "Pulse number outside the range of expected values" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        return PulseRecord(pulseNumber);
+    }
 }
 
 // Add definitions for other member functions of PulseWaves class here
